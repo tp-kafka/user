@@ -1,11 +1,20 @@
 package tp.kafka.user;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.UUID;
+
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
@@ -13,17 +22,33 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @RestController
 @AllArgsConstructor
-@Log4j2
-@RequestMapping("/user")
+@RequestMapping("user")
 public class UserResource {
 
     private KafkaService kafka;
 
-    User newUser(@RequestBody User user) {
-        Resource<User> resource = assembler.toResource(repository.save(newEmployee));
+    @PostMapping
+    ResponseEntity<User> newUser(@RequestBody UserRequest userCreationRequest) throws URISyntaxException {
+        var id = UUID.randomUUID();
+        var user = new User(id, userCreationRequest.getName(), userCreationRequest.getScreenname());
+        kafka.saveUser(user);
         return ResponseEntity
-            .created(new URI(resource.getId().expand().getHref()))
-            .body(resource);
+            .created(new URI("/user/" + id))
+            .body(user);
     }
+
+    @PutMapping("{id}")
+    ResponseEntity<User> modifyUser(@PathVariable("id") UUID id, @RequestBody UserRequest userModificationRequest) {
+        var user = new User(id, userModificationRequest.getName(), userModificationRequest.getScreenname());
+        kafka.saveUser(user);
+        return ResponseEntity.ok(user);
+    }
+
+    @DeleteMapping("{id}")
+    ResponseEntity<Void> deleteUser(@PathVariable("id") UUID id) {
+        kafka.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

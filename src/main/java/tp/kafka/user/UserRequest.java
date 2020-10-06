@@ -1,17 +1,14 @@
 package tp.kafka.user;
 
-import java.util.UUID;
-
 import org.hibernate.validator.constraints.Length;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
-public class User  {
-
-    UUID id;
+public class UserRequest {
+    @Length(min = 3, max=20)
     String screenname;
+    
+    @Length(min = 3, max=120)
     String name;
 }
