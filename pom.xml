@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>tp.kafka</groupId>
-	<artifactId>chat</artifactId>
+	<artifactId>user</artifactId>
 	<version>1.0</version>
 	<name>user</name>
 	<description>User Application</description>
